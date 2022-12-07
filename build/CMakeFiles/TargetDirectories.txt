@@ -1,0 +1,3 @@
+/Users/sid/Documents/7thsem/CG/Project/CGProject/build/CMakeFiles/Project.dir
+/Users/sid/Documents/7thsem/CG/Project/CGProject/build/CMakeFiles/edit_cache.dir
+/Users/sid/Documents/7thsem/CG/Project/CGProject/build/CMakeFiles/rebuild_cache.dir
