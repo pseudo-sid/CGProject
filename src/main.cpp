@@ -473,7 +473,7 @@ std::vector<std::vector<int>> pointsOnLine(const std::vector<int>& start, const 
     int axis = 1 + (rand() % (3 - 1 + 1));
     int sign = 1 + (rand() % (2 - 1 + 1));
     int change = 4.0;
-    
+
     switch (axis) {
     case 1:
         offsetX = sign ? change : -change;
@@ -560,8 +560,10 @@ void sanitizePoints(std::vector<std::vector<int>>& points, float MULTIPLIER) {
 }
 
 int main(int argc, char** argv) {
-    char fileName [strlen("./Lab06 ") + strlen(argv[1]) + 1];
-    strcpy(fileName, "./Lab06 ");
+    std::cout << "Left Mouse Button: Mark points for Crown" << std::endl;
+    std::cout << "Right Mouse Button: Mark points for Trunk" << std::endl;
+    char fileName [strlen("./ImageMarker ") + strlen(argv[1]) + 1];
+    strcpy(fileName, "./ImageMarker ");
     strcat(fileName, argv[1]);
     std::cout << fileName << std::endl;
 
