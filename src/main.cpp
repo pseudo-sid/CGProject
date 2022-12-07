@@ -153,7 +153,7 @@ std::vector<std::vector<int>> generateRandomPoints(int min_x, int max_x, int min
 
             int y = min_y + (yOffset * j);
             points.push_back(std::vector<int>{x, y});
-        }    
+        }
     }
 
     return points;
@@ -292,7 +292,10 @@ int createLine(unsigned int & program, unsigned int & shape_VAO, const std::vect
     
     // leaf positions
     for (auto p : curvePoints) {
-        leafPoints.push_back(p);
+        int verdict = 0 + (rand() % (1 - 0 + 1));
+
+        if (verdict == 0)
+            leafPoints.push_back(p);
         // int numberOfLeavesAtSpot = 1 + (rand() % (2 - 1 + 1));
         
         // for (int k = 0; k < numberOfLeavesAtSpot; k++)
@@ -376,7 +379,9 @@ std::unordered_map<std::string, std::string> buildTreeSkeleton(std::vector<int>&
             sort(items.begin(), items.end(), [](const std::pair<std::string, double>& a, const std::pair<std::string, double>& b) {
                 return a.second < b.second;
             });
-            int n = std::min((int) (3 + rand() % (8 - 3 + 1)), (int) items.size());
+            int minConnect = 6;
+            int maxConnect = 16;
+            int n = std::min((int) (minConnect + rand() % (maxConnect - minConnect + 1)), (int) items.size());
             items.resize(n);
             std::random_shuffle(items.begin(), items.end());
             
@@ -453,7 +458,7 @@ void addZCoordinateToPoints(std::vector<std::vector<int>>& points, int min_x, in
 std::vector<std::vector<int>> pointsOnLine(const std::vector<int>& start, const std::vector<int>& end) {
     std::vector<std::vector<int>> points;
     double lineLength = sqrt(pow(end[0] - start[0], 2) + pow(end[1] - start[1], 2) + pow(end[2] - start[2], 2));
-    double minDistantApart = 6.0;
+    double minDistantApart = 10.0;
     int numberOfPoints = floor(lineLength / minDistantApart);
 
     if (numberOfPoints == 0)
@@ -468,7 +473,7 @@ std::vector<std::vector<int>> pointsOnLine(const std::vector<int>& start, const 
     int axis = 1 + (rand() % (3 - 1 + 1));
     int sign = 1 + (rand() % (2 - 1 + 1));
     int change = 4.0;
-
+    
     switch (axis) {
     case 1:
         offsetX = sign ? change : -change;
@@ -519,7 +524,7 @@ void printVector(const std::vector<int>& v) {
 }
 
 float findSanitizePointsMultiplier(std::vector<std::vector<int>>& points, std::vector<int> minMax) {
-    float MIN = -120, MAX = 120;
+    float MIN = -100, MAX = 100;
     int MIN_VALUE_X = minMax[0];
     int MAX_VALUE_X = minMax[1];
     int MIN_VALUE_Y = minMax[2];
@@ -600,6 +605,28 @@ int main(int argc, char** argv) {
     std::cout << "number of points inside crown: " << insideCrownPoints.size() << std::endl;
     
     addZCoordinateToPoints(insideCrownPoints, maxMins[0], maxMins[1], maxMins[2], maxMins[3]);
+
+    for (auto p : crownPoints) {
+        int vvv = 0 + (rand() % (2 - 0 + 1));
+
+        if (vvv == 0)
+            continue;
+
+        int reducer = 5 + (rand() % (20 - 5 + 1));
+
+        std::vector<std::vector<float>> cp = getRandomCircle(
+            std::vector<int> {0, p[1], 0},
+            (float) distance(std::vector<int> {0, p[1], 0}, std::vector<int> {p[0] - reducer, p[1] - reducer, p[2] - reducer}),
+            (float) 6 + (rand() % (10 - 6 + 1))
+        );
+
+        for (auto pp : cp) {
+            int verdict = 0 + (rand() % (2 - 0 + 1));
+
+            if (verdict == 0)
+                insideCrownPoints.push_back(std::vector<int> {(int) pp[0], (int) pp[1], (int) pp[2]});
+        }
+    }
 
     std::unordered_map<std::string, std::vector<int>> crownPointsMap;
     std::unordered_map<std::string, std::vector<int>> trunkPointsMap;
@@ -716,7 +743,8 @@ int main(int argc, char** argv) {
 
     oldX = oldY = currentX = currentY = 0.0;
     int prevLeftButtonState = GLFW_RELEASE;
-    int leavesFactor = 100;
+    int leavesFactor = 200;
+    float leafR = 0.1, leafG = 0.9, leafB = 0.1;
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -773,15 +801,47 @@ int main(int argc, char** argv) {
 
             ImGui::Text("Use LEFT ARROW to decrease the number of leaves");
             ImGui::Text("Use RIGHT ARROW to increase the number of leaves");
-            // ImGui::Text("Leaf Density: " +  + "%");
             
-
+            // Control Leaf Density
             if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_LeftArrow))) {
                 leavesFactor++;
                 leavesFactor = std::min(leavesFactor, 200);
             } else if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_RightArrow))) {
                 leavesFactor--;
                 leavesFactor = std::max(leavesFactor, 1);
+            }
+
+            // Control Leaf R Color
+            if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_X))) {
+                if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow))) {
+                    leafR += 0.05;
+                    leafR = std::min(leafR, 1.0f);
+                } else if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow))) {
+                    leafR -= 0.05;
+                    leafR = std::max(leafR, 0.0f);
+                }
+            }
+
+            // Control Leaf G Color
+            if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Y))) {
+                if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow))) {
+                    leafG += 0.05;
+                    leafG = std::min(leafG, 1.0f);
+                } else if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow))) {
+                    leafG -= 0.05;
+                    leafG = std::max(leafG, 0.0f);
+                }
+            }
+
+            // Control Leaf B Color
+            if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_Z))) {
+                if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_UpArrow))) {
+                    leafB += 0.05;
+                    leafB = std::min(leafB, 1.0f);
+                } else if (ImGui::IsKeyDown(ImGui::GetKeyIndex(ImGuiKey_DownArrow))) {
+                    leafB -= 0.05;
+                    leafB = std::max(leafB, 0.0f);
+                }
             }
 
             if (ImGui::Button(showBranches ? "Hide Branches" : "Show Branches")) {
@@ -839,7 +899,8 @@ int main(int argc, char** argv) {
                 }
 
                 glPointSize(2);
-                glDrawArrays(GL_TRIANGLE_STRIP, 0, trunkCirclePoints[i].size());
+                glDrawArrays(GL_QUAD_STRIP, 0, trunkCirclePoints[i].size());
+                // glDrawArrays(GL_TRIANGLE_STRIP, 0, trunkCirclePoints[i].size());
             }
         }
 
@@ -850,7 +911,7 @@ int main(int argc, char** argv) {
                 if (showDisco) {
                     glUniform3f(vColor_uniform, ((float) rand() / (float) RAND_MAX), ((float) rand() / (float) RAND_MAX), ((float) rand() / (float) RAND_MAX));
                 } else {
-                    glUniform3f(vColor_uniform, 0.1, 0.9, 0.1);
+                    glUniform3f(vColor_uniform, leafR, leafG, leafB);
                 }
 
                 glDrawArrays(GL_POLYGON, 0, 8);
