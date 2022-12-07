@@ -474,7 +474,7 @@ void CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 int main(int, char **) {
     // cv::IplImage *ipl = cv::cvLoadImage()
-    cv::Mat img = cv::imread("../tree.png");
+    cv::Mat img = cv::imread("tree.png");
 
     if(img.empty()){
         std::cout << "Image couldn't be loaded\n";
